@@ -2,11 +2,15 @@ buildscript {
     repositories {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
+
+        jcenter()
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.11.1"
         classpath "org.grails.plugins:hibernate5:6.0.0"
+
+        classpath 'com.bmuschko:gradle-clover-plugin:2.1.0'
     }
 }
 
@@ -19,6 +23,8 @@ apply plugin:"war"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.grails-gsp"
 apply plugin:"asset-pipeline"
+
+apply plugin: 'com.bmuschko.clover'
 
 repositories {
     mavenLocal()
@@ -54,10 +60,78 @@ dependencies {
     testCompile "org.grails.plugins:geb"
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
+
+    clover 'org.openclover:clover:4.2.0'
 }
 
 
 assets {
     minifyJs = true
     minifyCss = true
+}
+
+clover {
+//    classesBackupDir = file("${sourceSets.main.classesDir}-backup") // NOTE: dlehammer, disabled to avoid: Could not get unknown property 'classesDir' for source set 'main' of type org.gradle.api.internal.tasks.DefaultSourceSet.
+//    licenseLocation = 'clover-license.txt' // NOTE: dlehammer, disabled to avoid:  File 'clover-license.txt' specified for property 'licenseFile' does not exist. Added empty dummy clover.license to ${project.rootDir} to avoid: 'clover.license' specified for property 'licenseFile' does not exist. 
+    excludes = ['**/SynchronizedMultiValueMap.java']
+    testExcludes = ['**/Mock*.java']
+
+    testIncludes = ['**/Spec.groovy'] // NOTE: dlehammer, explicit declaration for Spock test inclusion
+
+    targetPercentage = '85%'
+
+    // Each additional source set is defined by a map
+    // having a srcDirs and classesDir element.
+/*    additionalSourceSets << [ // NOTE: dlehammer, disabled as this is a vanilla Grails project (and an attempt to avoid: Could not get unknown property 'classesDir' ...)
+            srcDirs: sourceSets.generated.allSource.srcDirs,
+            classesDir: sourceSets.generated.output.classesDir
+    ]
+    additionalTestSourceSets << [
+            srcDirs: sourceSets.integration.allSource.srcDirs,
+            classesDir: sourceSets.integration.output.classesDir
+    ]
+
+    // Closure based syntax for additionalSourceSets and
+    // additionalTestSourceSets is also supported
+    additionalSourceSet {
+        srcDirs = sourceSets.generatedJava.allSource.srcDirs
+        classesDir = sourceSets.generated.output.classesDir
+    }
+*/
+    compiler {
+        encoding = 'UTF-8'
+
+        // if the javac executable used by ant should be the same as the one used elsewhere.
+//        executable = file('/usr/local/java/jdk1.8.0_05') // NOTE: dlehammer, disabled as JDK 8 is provided via path
+    }
+
+    contexts {
+        statement {
+            name = 'log'
+            regexp = '^.*LOG\\..*'
+        }
+
+        method {
+            name = 'main'
+            regexp = 'public static void main\\(String args\\[\\]\\).*'
+        }
+        method {
+            name = 'getters'
+            regexp = 'public [^\\s]+ get[A-Z][^\\s]+\\(\\)'
+            maxStatements = 1
+        }
+        method {
+            name = 'setters'
+            regexp = 'public void set[A-Z][^\\s]+\\(.+\\)'
+            maxStatements = 1
+        }
+    }
+
+    report {
+        html = true
+        pdf = true
+        filter = 'log,main,getters,setters'
+        testResultsDir = project.tasks.getByName('test').reports.junitXml.destination
+        testResultsInclude = 'TEST-*.xml'
+    }
 }
