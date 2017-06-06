@@ -16,7 +16,10 @@ class MyServiceSpec extends Specification {
     }
 
     void "test something"() {
-        expect:"fix me"
-            true == false
+        when:
+            def result = service.serviceMethod()
+
+        then:
+            result == 'hit main service branch'
     }
 }

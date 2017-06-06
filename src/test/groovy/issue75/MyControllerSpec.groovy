@@ -16,7 +16,10 @@ class MyControllerSpec extends Specification {
     }
 
     void "test something"() {
-        expect:"fix me"
-            true == false
+        when:
+            def result = controller.index()
+
+        then:
+            result == 'hit main controller branch'
     }
 }
