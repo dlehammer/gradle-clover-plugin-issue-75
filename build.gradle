@@ -17,6 +17,8 @@ buildscript {
 version "0.1"
 group "issue75"
 
+apply plugin: 'groovy' // @sdelamo's suggested workaround
+
 apply plugin:"eclipse"
 apply plugin:"idea"
 apply plugin:"war"
