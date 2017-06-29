@@ -78,7 +78,7 @@ clover {
 
     testIncludes = ['**/Spec.groovy'] // NOTE: dlehammer, explicit declaration for Spock test inclusion
 
-    targetPercentage = '85%'
+    targetPercentage = '50%'
 
     // Each additional source set is defined by a map
     // having a srcDirs and classesDir element.
