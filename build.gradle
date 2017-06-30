@@ -76,7 +76,7 @@ clover {
     excludes = ['**/SynchronizedMultiValueMap.java']
     testExcludes = ['**/Mock*.java']
 
-    testIncludes = ['**/Spec.groovy'] // NOTE: dlehammer, explicit declaration for Spock test inclusion
+    testIncludes = ['**/*Spec.groovy'] // NOTE: dlehammer, explicit declaration for Spock test inclusion
 
     targetPercentage = '50%'
 
